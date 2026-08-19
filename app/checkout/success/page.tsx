@@ -1,7 +1,10 @@
-import { cookies } from 'next/headers';
-
-export default function CheckoutSuccessPage({ searchParams }: { searchParams?: { session_id?: string } }) {
-  const sessionId = searchParams?.session_id ?? null;
+export default async function CheckoutSuccessPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ session_id?: string }>;
+}) {
+  const params = await searchParams;
+  const sessionId = params?.session_id ?? null;
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
