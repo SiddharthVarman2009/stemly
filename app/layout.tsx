@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Analytics } from '@vercel/analytics/next';
 import Script from 'next/script';
 import './globals.css';
 import { CartProvider } from './components/CartProvider';
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           src="https://widgets.givebutter.com/latest.umd.cjs?acct=ZiVbjqMl9S3xFCeq&p=other"
           strategy="lazyOnload"
         />
+        <Analytics />
       </body>
     </html>
   );
