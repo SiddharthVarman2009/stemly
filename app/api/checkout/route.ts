@@ -18,11 +18,20 @@ export async function POST(request: Request) {
 			return NextResponse.json({ error: 'No items provided' }, { status: 400 });
 		}
 
+		const configuredProductPriceId = process.env.STRIPE_PRICE_FOUNDATIONAL;
+		let usableProductPriceId: string | undefined;
+		if (configuredProductPriceId) {
+			const priceCheck = await fetch(`https://api.stripe.com/v1/prices/${configuredProductPriceId}`, {
+				headers: { Authorization: `Bearer ${stripeSecret}` },
+			});
+			if (priceCheck.ok) usableProductPriceId = configuredProductPriceId;
+		}
+
 		// Product catalog
 		const productCatalog: Record<string, { price: number; priceId?: string }> = {
 			'foundational-3in1-kit': {
 				price: 15.0,
-				priceId: process.env.STRIPE_PRICE_FOUNDATIONAL,
+				priceId: usableProductPriceId,
 			},
 		};
 
@@ -55,7 +64,13 @@ export async function POST(request: Request) {
 		// Optional shipping: prefer a Stripe Shipping Rate (shipping_rate ID). If none configured,
 		// create a shipping rate dynamically for $5.23 (523 cents) and attach it; otherwise
 		// fall back to a flat shipping line item.
-		const shippingRateId = process.env.STRIPE_SHIPPING_RATE_ID || process.env.NEXT_PUBLIC_STRIPE_SHIPPING_RATE_ID;
+		let shippingRateId = process.env.STRIPE_SHIPPING_RATE_ID || process.env.NEXT_PUBLIC_STRIPE_SHIPPING_RATE_ID;
+		if (shippingRateId) {
+			const shippingCheck = await fetch(`https://api.stripe.com/v1/shipping_rates/${shippingRateId}`, {
+				headers: { Authorization: `Bearer ${stripeSecret}` },
+			});
+			if (!shippingCheck.ok) shippingRateId = undefined;
+		}
 		let shippingCents = Number(process.env.STRIPE_SHIPPING_PRICE_CENTS ?? 0);
 
 		// If user/deployment didn't configure shipping, default to $5.23 (523 cents) per request

@@ -154,9 +154,11 @@ export default function KitPage() {
                     window.location.href = data.url;
                   } else {
                     console.error('Checkout error', data);
+                    toast.error(data?.error || 'Checkout could not be started. Please try again.');
                   }
                 } catch (err) {
                   console.error(err);
+                  toast.error('Checkout could not be started. Please try again.');
                 } finally {
                   setLoadingCheckout(false);
                 }

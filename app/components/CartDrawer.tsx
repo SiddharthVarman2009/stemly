@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 import { useCart } from './CartProvider';
 
 type Props = {
@@ -79,9 +80,11 @@ export function CartDrawer({ open, onClose }: Props) {
                     window.location.href = data.url;
                   } else {
                     console.error('Checkout error', data);
+                    toast.error(data?.error || 'Checkout could not be started. Please try again.');
                   }
                 } catch (err) {
                   console.error(err);
+                  toast.error('Checkout could not be started. Please try again.');
                 }
               }}
               className="flex w-full items-center justify-center rounded-lg h-10 px-2.5 text-sm font-medium bg-stemly-blue text-white hover:bg-stemly-blue/90 transition-colors"
